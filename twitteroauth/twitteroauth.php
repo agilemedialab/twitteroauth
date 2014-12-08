@@ -179,6 +179,11 @@ class TwitterOAuth {
     return $response;
   }
 
+  /**
+   * To upload media files
+   * @param  array  $images   Urls of media files to upload
+   * @return string           Comma separated media ids
+   */
   function upload($images) {
     $mediaIds = array();
 
@@ -264,5 +269,29 @@ class TwitterOAuth {
       $this->http_header[$key] = $value;
     }
     return strlen($header);
+  }
+
+  /**
+   * Added to go well with the Symfony2
+   * @param  $oauth_token
+   * @param  $oauth_token_secret
+   * @return void
+   */
+  function setOAuthToken($oauth_token, $oauth_token_secret) {
+      $this->token = new OAuthConsumer($oauth_token, $oauth_token_secret);
+  }
+
+  /**
+   * Avoid the notices if the token is not set
+   * @param  $request
+   * @return array
+   */
+  function getToken($request) {
+    $token = OAuthUtil::parse_parameters($request);
+    if (isset($token['oauth_token'], $token['oauth_token_secret'])) {
+        $this->token = new OAuthConsumer($token['oauth_token'], $token['oauth_token_secret']);
+    }
+
+    return $token;
   }
 }
