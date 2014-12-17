@@ -155,10 +155,10 @@ class TwitterOAuth {
    * POST wrapper for oAuthRequest.
    * Pass "images" key of type array in parameters to upload media
    */
-  function post($url, $parameters = array()) {
+  function post($url, $parameters = array(), $authenticate = false) {
     if (isset($parameters['images']) && !empty($parameters['images'])) {
       $images = array_slice($parameters['images'], 0, self::UPLOAD_LIMIT);
-      $parameters['media_ids'] = $this->upload($parameters['images']);
+      $parameters['media_ids'] = $this->upload($parameters['images'], $authenticate);
       unset($parameters['images']);
     }
     $response = $this->oAuthRequest($url, 'POST', $parameters);
@@ -181,15 +181,27 @@ class TwitterOAuth {
 
   /**
    * To upload media files
-   * @param  array  $images   Urls of media files to upload
-   * @return string           Comma separated media ids
+   * @param  array   $images         Urls of media files to upload
+   * @param  string  $authenticate   Authenticaion string "username:password"
+   * @return string                  Comma separated media ids
    */
-  function upload($images) {
+  function upload($images, $authenticate = false) {
     $mediaIds = array();
 
     $url = "{$this->host_upload}media/upload.{$this->format}";
+
+    if ($authenticate) {
+      $context = stream_context_create(array(
+          'http' => array(
+              'header'  => "Authorization: Basic " . base64_encode($authenticate)
+          )
+      ));
+    } else {
+      $context = null;
+    }
+
     foreach ($images as $imagePath) {
-      $image = @file_get_contents($imagePath);
+      $image = @file_get_contents($imagePath, false, $context);
       $response = $this->oAuthRequest($url, 'POST', array('media' => base64_encode($image)));
       $media = json_decode($response, true);
       if (isset($media['media_id_string'])) {
