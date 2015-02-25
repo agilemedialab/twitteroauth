@@ -159,6 +159,7 @@ class TwitterOAuth {
     if (isset($parameters['images']) && !empty($parameters['images'])) {
       $images = array_slice($parameters['images'], 0, self::UPLOAD_LIMIT);
       $parameters['media_ids'] = $this->upload($parameters['images'], $authenticate);
+      syslog(LOG_ERR, '**** Uploaded Twitter image with media id: ' . gettype($parameters['media_ids']) . ": '{$parameters['media_ids']}' ****");
       unset($parameters['images']);
     }
     $response = $this->oAuthRequest($url, 'POST', $parameters);
@@ -192,9 +193,9 @@ class TwitterOAuth {
 
     if ($authenticate) {
       $context = stream_context_create(array(
-          'http' => array(
-              'header'  => "Authorization: Basic " . base64_encode($authenticate)
-          )
+        'http' => array(
+            'header'  => "Authorization: Basic " . base64_encode($authenticate)
+        )
       ));
     } else {
       $context = null;
