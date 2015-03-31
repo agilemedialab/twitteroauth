@@ -158,7 +158,7 @@ class TwitterOAuth {
   function post($url, $parameters = array(), $authenticate = false) {
     if (isset($parameters['images']) && !empty($parameters['images'])) {
       $images = array_slice($parameters['images'], 0, self::UPLOAD_LIMIT);
-      $parameters['media_ids'] = $this->upload($parameters['images'], $authenticate);
+      $parameters['media_ids'] = $this->upload($images, $authenticate);
       syslog(LOG_ERR, '**** Uploaded Twitter image with media id: ' . gettype($parameters['media_ids']) . ': "' . $parameters['media_ids'] . '" ****');
       unset($parameters['images']);
     }
