@@ -204,7 +204,7 @@ class TwitterOAuth {
     foreach ($images as $imagePath) {
       $image = @file_get_contents($imagePath, false, $context);
       if (false === $image) {
-        syslog(LOG_ERR, 'Failed to get file contents for image: ' . $imagePath)
+        syslog(LOG_ERR, 'Failed to get file contents for image: ' . $imagePath);
       }
       $response = $this->oAuthRequest($url, 'POST', array('media' => base64_encode($image)));
       $media = json_decode($response, true);
